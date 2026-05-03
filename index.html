@@ -377,10 +377,10 @@ input[type="range"]::-moz-range-thumb {
     elements.clearChatBtn.addEventListener('click', clearChat);
     elements.chatForm.addEventListener('submit', handleSubmit);
     
-    elements.messageInput.addEventListener('keydown', (e) => {
+   elements.messageInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    handleSubmit(e); // Call directly instead of dispatching
+    elements.chatForm.requestSubmit(); // ✅ correct
   }
 });
     // Auto-resize textarea
@@ -495,11 +495,17 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
     
     if (save) {
-      state.messages.push({ role, content });
-      if (state.memory) {
-        localStorage.setItem('ananya_messages', JSON.stringify(state.messages));
-      }
-    }
+  state.messages.push({ role, content });
+
+  const MAX_MESSAGES = 50;
+  if (state.messages.length > MAX_MESSAGES) {
+    state.messages = state.messages.slice(-MAX_MESSAGES);
+  }
+
+  if (state.memory) {
+    localStorage.setItem('ananya_messages', JSON.stringify(state.messages));
+  }
+}
   }
 
   function escapeHtml(text) {
