@@ -547,6 +547,7 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
   }
 
   async function callAPI(userMessage) {
+    console.log("API CALLED");
     const systemPrompt = buildSystemPrompt();
     const messages = [{ role: 'system', content: systemPrompt }];
     
