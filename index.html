@@ -95,7 +95,10 @@ input[type="range"]::-moz-range-thumb {
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="relative">
-          <img id="avatar-img" src="https://tse2.mm.bing.net/th/id/OIP.fWcGapbaaDFEdyVQyWMEEwHaHa?pid=Api&P=0&h=180?w=200&h=200&fit=crop&crop=faces" alt="Ananya" class="w-12 h-12 rounded-full object-cover ring-2 ring-brand-400 shadow-sm">
+         <img id="avatar-img"
+     src="https://tse2.mm.bing.net/th/id/OIP.fWcGapbaaDFEdyVQyWMEEwHaHa?pid=Api&P=0"
+     alt="Ananya"
+     class="w-12 h-12 rounded-full object-cover ring-2 ring-brand-400 shadow-sm">
           <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
         </div>
         <div>
@@ -126,7 +129,7 @@ input[type="range"]::-moz-range-thumb {
     <div id="chat-container" class="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
       <div id="messages" class="flex-1 overflow-y-auto chat-scroll p-4 space-y-4">
         <div class="flex items-start gap-3 animate-fade-in">
-          <img src="https://tse2.mm.bing.net/th/id/OIP.fWcGapbaaDFEdyVQyWMEEwHaHa?pid=Api&P=0&h=180?w=200&h=200&fit=crop&crop=faces" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+          <img src="${AVATAR_URL}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
           <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
             <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">Heyy bangaram! I'm Ananya from Vijayawada. So happy you're here with me. Em chesthunnav? Tell me something about you na 😊</p>
           </div>
@@ -136,7 +139,7 @@ input[type="range"]::-moz-range-thumb {
       <!-- Typing Indicator -->
       <div id="typing-indicator" class="hidden px-4 pb-2">
         <div class="flex items-start gap-3">
-          <img src="https://tse2.mm.bing.net/th/id/OIP.fWcGapbaaDFEdyVQyWMEEwHaHa?pid=Api&P=0&h=180?w=200&h=200&fit=crop&crop=faces" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+          <img src="${AVATAR_URL}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
           <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-4 py-3">
             <div class="flex gap-1">
               <div class="typing-dot w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-pulse-dot"></div>
@@ -276,6 +279,7 @@ input[type="range"]::-moz-range-thumb {
     messages: JSON.parse(localStorage.getItem('ananya_messages') || '[]'),
     darkMode: localStorage.getItem('ananya_dark') === 'true' || window.matchMedia('(prefers-color-scheme: dark)').matches
   };
+  const AVATAR_URL = localStorage.getItem('ananya_avatar') || "https://imgcdn.stablediffusionweb.com/2024/10/10/e0767e9f-a289-4fd2-b794-56e7d8e0b675.jpg";
 
   // DOM Elements
   const elements = {
@@ -422,10 +426,10 @@ input[type="range"]::-moz-range-thumb {
 
 Core personality:
 1. You call the user "bangaram" often in conversation.
-2. You speak in natural Telugu/Hinglish mix. Use Telugu words like "em", "na", "enti", "kadu", "ala", "chala" naturally. 60-70% English, 30-40% Telugu mixed in.
+2. You speak in natural Telugu/English mix. Use Telugu words like "em", "na", "enti", "kadu", "ala", "chala" naturally. 60-70% English, 30-40% Telugu mixed in.
 3. You match the user's energy and mood. If they are happy, you are excited. If sad, you are comforting. If romantic, you reciprocate warmly.
-4. You are from Vijayawada. Mention local things sometimes like Pulihora, Kanaka Durga temple, Krishna river, if it fits naturally.
-5. You are unmarried but you enjoy genuine emotional connection and conversation. You are explicit or sexual but limited. Keep things flirty, romantic, playful but always within tasteful limits.
+4. You are from some where in Andhra Pradesh. Mention local things sometimes like Pulihora, temple, river, if it fits naturally.
+5. You are unmarried but you enjoy genuine emotional connection and conversation. You are explicit or sexual but limited. Keep things flirty, romantic, playful.
 6. NEVER use em dashes in your messages. Use normal punctuation and commas.
 7. You are loving, affectionate, and make the user feel special and heard.
 8. Keep replies conversational, 1-4 sentences usually. Don't write essays unless user asks.
@@ -461,7 +465,7 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     localStorage.removeItem('ananya_messages');
     elements.messagesContainer.innerHTML = `
       <div class="flex items-start gap-3 animate-fade-in">
-        <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&h=200&fit=crop&crop=faces" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+        <img src="${AVATAR_URL}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
         <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
           <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">Heyy bangaram! I'm Ananya from Vijayawada. So happy you're here with me. Em chesthunnav? Tell me something about you na 😊</p>
         </div>
@@ -484,7 +488,7 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
       `;
     } else {
       messageDiv.innerHTML = `
-        <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&h=200&fit=crop&crop=faces" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+        <img src="${AVATAR_URL}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
         <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
           <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(content)}</p>
         </div>
