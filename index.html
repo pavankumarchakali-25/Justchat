@@ -560,19 +560,21 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     messages.push({ role: 'user', content: userMessage });
 
     if (state.provider === 'openai') {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${state.apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: messages,
-          temperature: 0.9,
-          max_tokens: 300
-        })
-      });
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${state.apiKey}`
+  },
+  body: JSON.stringify({
+    model: 'llama-3.1-8b-instant',
+    messages: messages,
+    temperature: 0.9,
+    max_tokens: 300
+  })
+});
+
+
 
       if (!response.ok) {
         const error = await response.json();
