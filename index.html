@@ -378,12 +378,11 @@ input[type="range"]::-moz-range-thumb {
     elements.chatForm.addEventListener('submit', handleSubmit);
     
     elements.messageInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        elements.chatForm.dispatchEvent(new Event('submit'));
-      }
-    });
-
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSubmit(e); // Call directly instead of dispatching
+  }
+});
     // Auto-resize textarea
     elements.messageInput.addEventListener('input', function() {
       this.style.height = 'auto';
@@ -511,6 +510,8 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (elements.sendBtn.disabled) return; // <-- ADD THIS LINE
+
     const message = elements.messageInput.value.trim();
     if (!message || !state.apiKey) return;
 
