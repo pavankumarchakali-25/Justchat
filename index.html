@@ -551,17 +551,17 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     const messages = [{ role: 'system', content: systemPrompt }];
     
     if (state.memory && state.messages.length > 0) {
-      const historyLimit = 10;
-      cconst filteredMessages = state.messages
-  .filter((_, i) => i !== state.messages.length - 1);
+  const historyLimit = 10;
 
-const recentMessages = filteredMessages.slice(-historyLimit);
+  const filteredMessages = state.messages.filter(m => m.role !== 'assistant');
 
-messages.push(...recentMessages.map(m => ({
-  role: m.role,
-  content: m.content
-})));
-    }
+  const recentMessages = filteredMessages.slice(-historyLimit);
+
+  messages.push(...recentMessages.map(m => ({
+    role: m.role,
+    content: m.content
+  })));
+}
     
     messages.push({ role: 'user', content: userMessage });
 
