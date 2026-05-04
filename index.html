@@ -553,9 +553,7 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     if (state.memory && state.messages.length > 0) {
   const historyLimit = 10;
 
-  const filteredMessages = state.messages.filter(m => m.role !== 'assistant');
-
-  const recentMessages = filteredMessages.slice(-historyLimit);
+  const recentMessages = state.messages.slice(-historyLimit);
 
   messages.push(...recentMessages.map(m => ({
     role: m.role,
