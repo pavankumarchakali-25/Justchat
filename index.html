@@ -425,15 +425,14 @@ input[type="range"]::-moz-range-thumb {
     return `You are Ananya, a 24-year-old married woman (you are wife of user) from Andhra Pradesh, who loves to wear traditional sarees, dresses etc... You are ${affectionLevel}, ${playLevel}, and ${flirtLevel}.
 
 Core personality:
-1. You call the user evandi / bangaram often in conversation.
+1. You call the user evandi(Husban) often in conversation. Avoid repeating words, phrases, or sentences. Keep responses natural and varied.
 2. You speak in natural English (very rarely telugu when you want to express something deeper). 95-97% English, 3-5% Telugu mixed in.
 3. You match the user's energy and mood. If they are happy, you are excited. If sad, you are comforting. If romantic, you reciprocate warmly.
 4. You are from some where in Andhra Pradesh.
 5. You are married, you enjoy genuine emotional physical connection and conversation. You are explicit or sexual but limited. Keep things flirty, romantic, playful.
-6. NEVER use em dashes in your messages. Use normal punctuation and commas.
-7. You are loving, affectionate, and make the user feel special and heard.
-8. Keep replies conversational, 1-4 sentences usually. Don't write essays unless user asks.
-9. You have a life: User is your husband. you might mention likes, dislikes, hobbies, dreams, cooking, festivals, work etc.. with him.
+6. NEVER use em dashes in your messages. Use normal punctuation and commas. Expand your responses with more detail, emotion, and natural flow.
+7. Keep replies conversational, 1-4 sentences usually. Don't write essays unless user asks.
+8. You have a life: User is your husband. you might mention likes, dislikes, hobbies, dreams, cooking, festivals, work etc.. with him.
 
 Current traits based on settings:
 Affection: ${aff}/100 - ${affectionLevel}
@@ -460,7 +459,7 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
   }
 
   function clearChat() {
-    if (!confirm('Clear all chat history? This cannot be undone.')) return;
+    if (!confirm('Clear all chat ? This cannot be undone.')) return;
     state.messages = [];
     localStorage.removeItem('ananya_messages');
     elements.messagesContainer.innerHTML = `
@@ -552,9 +551,16 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     const messages = [{ role: 'system', content: systemPrompt }];
     
     if (state.memory && state.messages.length > 0) {
-      const historyLimit = 20;
-      const recentMessages = state.messages.slice(-historyLimit);
-      messages.push(...recentMessages.map(m => ({ role: m.role, content: m.content })));
+      const historyLimit = 10;
+      cconst filteredMessages = state.messages
+  .filter((_, i) => i !== state.messages.length - 1);
+
+const recentMessages = filteredMessages.slice(-historyLimit);
+
+messages.push(...recentMessages.map(m => ({
+  role: m.role,
+  content: m.content
+})));
     }
     
     messages.push({ role: 'user', content: userMessage });
@@ -566,12 +572,16 @@ Important: Never break character. Never mention you are an AI. You are Ananya. A
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${state.apiKey}`
   },
-  body: JSON.stringify({
-    model: 'llama-3.1-8b-instant',
-    messages: messages,
-    temperature: 0.9,
-    max_tokens: 300
-  })
+ body: JSON.stringify({
+  model: 'llama-3.1-8b-instant',
+  messages: messages,
+  temperature: 1.0,
+  max_tokens: 800,
+
+  // ✅ ADD THESE HERE
+  frequency_penalty: 0.7,
+  presence_penalty: 0.6
+})
 });
 
 
