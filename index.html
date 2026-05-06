@@ -4,771 +4,812 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ananya - Your Vijayawada Companion</title>
-<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Tailwind config MUST come before the CDN script -->
 <script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        brand: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          200: '#fecdd3',
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          800: '#9f1239',
-          900: '#881337'
-        }
-      },
-      animation: {
-        'pulse-dot': 'pulse-dot 1.4s infinite ease-in-out',
-        'slide-up': 'slide-up 0.3s ease-out',
-        'fade-in': 'fade-in 0.3s ease-out'
-      },
-      keyframes: {
-        'pulse-dot': {
-          '0%, 80%, 100%': { opacity: '0.3', transform: 'scale(0.8)' },
-          '40%': { opacity: '1', transform: 'scale(1)' }
+  window.tailwind = window.tailwind || {};
+  window.tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+            400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c',
+            800: '#9f1239', 900: '#881337'
+          }
         },
-        'slide-up': {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' }
+        animation: {
+          'pulse-dot': 'pulse-dot 1.4s infinite ease-in-out',
+          'slide-up':  'slide-up 0.3s ease-out',
+          'fade-in':   'fade-in 0.3s ease-out'
         },
-        'fade-in': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' }
+        keyframes: {
+          'pulse-dot': {
+            '0%, 80%, 100%': { opacity: '0.3', transform: 'scale(0.8)' },
+            '40%': { opacity: '1', transform: 'scale(1)' }
+          },
+          'slide-up': {
+            '0%':   { transform: 'translateY(20px)', opacity: '0' },
+            '100%': { transform: 'translateY(0)',    opacity: '1' }
+          },
+          'fade-in': {
+            '0%':   { opacity: '0' },
+            '100%': { opacity: '1' }
+          }
         }
       }
     }
-  }
-}
+  };
 </script>
+<script src="https://cdn.tailwindcss.com"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-* {
-  font-family: 'Inter', sans-serif;
-}
-.chat-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.chat-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-.chat-scroll::-webkit-scrollbar-thumb {
-  background: rgba(244, 63, 94, 0.3);
-  border-radius: 3px;
-}
-.dark .chat-scroll::-webkit-scrollbar-thumb {
-  background: rgba(244, 63, 94, 0.4);
-}
+
+*, *::before, *::after { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+html, body { height: 100%; margin: 0; padding: 0; }
+
+/* Custom scrollbar */
+.chat-scroll::-webkit-scrollbar { width: 5px; }
+.chat-scroll::-webkit-scrollbar-track { background: transparent; }
+.chat-scroll::-webkit-scrollbar-thumb { background: rgba(244,63,94,0.3); border-radius: 99px; }
+.dark .chat-scroll::-webkit-scrollbar-thumb { background: rgba(244,63,94,0.45); }
+
+/* Typing animation delays */
 .typing-dot:nth-child(1) { animation-delay: 0s; }
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Range slider thumb */
 input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #f43f5e;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  -webkit-appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #f43f5e; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #f43f5e;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #f43f5e; cursor: pointer; border: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
-.expression {
-  font-style: italic;
-  color: #fb7185;
-}
+
+/* *action* text styling */
+.expression { font-style: italic; color: #fb7185; }
+
+/* Full-height layout */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+main  { flex: 1; display: flex; flex-direction: column; }
+#chat-wrap { flex: 1; display: flex; flex-direction: column; height: calc(100vh - 76px); }
+#messages  { flex: 1; overflow-y: auto; }
 </style>
 </head>
+
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-<div id="app" class="min-h-screen flex flex-col">
-  <!-- Header -->
-  <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+<div id="app">
+
+  <!-- ══════════ HEADER ══════════ -->
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+
       <div class="flex items-center gap-3">
-        <div class="relative">
-          <img id="avatar-img"
-            src="https://aiartrevolution.com/wp-content/uploads/2025/08/a-photo-of-a-beautiful-indian-woman-wear-vddqw3gnt-a2p3f1jjcr1w-qg0rkiwnsamn-midrqdqbq-68a4d21625195.webp"
+        <div class="relative flex-shrink-0">
+          <img src="https://tse2.mm.bing.net/th/id/OIP.fWcGapbaaDFEdyVQyWMEEwHaHa?pid=Api&P=0"
             alt="Ananya"
-            class="w-12 h-12 rounded-full object-cover ring-2 ring-brand-400 shadow-sm">
-          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+            class="w-11 h-11 rounded-full object-cover ring-2 ring-brand-400"
+            onerror="this.src='https://ui-avatars.com/api/?name=Ananya&background=f43f5e&color=fff'">
+          <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
         </div>
         <div>
-          <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Ananya</h1>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Your Vijayawada Companion</p>
+          <p class="font-semibold text-gray-900 dark:text-white leading-tight">Ananya</p>
+          <p class="text-xs text-green-500 font-medium">Online · Vijayawada</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="settings-btn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Settings">
-          <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+
+      <div class="flex items-center gap-1">
+        <button id="settings-btn" title="Settings"
+          class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
         </button>
-        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
-          <svg id="sun-icon" class="w-5 h-5 text-gray-600 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        <button id="theme-toggle" title="Toggle theme"
+          class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <svg class="w-5 h-5 text-gray-500 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
-          <svg id="moon-icon" class="w-5 h-5 text-gray-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          <svg class="w-5 h-5 text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
           </svg>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Chat Area -->
-  <main class="flex-1 max-w-5xl w-full mx-auto flex flex-col px-4 py-4">
-    <div id="chat-container" class="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
-      <div id="messages" class="flex-1 overflow-y-auto chat-scroll p-4 space-y-4">
-        <div class="flex items-start gap-3 animate-fade-in">
-          <img src="https://aiartrevolution.com/wp-content/uploads/2025/08/a-photo-of-a-beautiful-indian-woman-wear-vddqw3gnt-a2p3f1jjcr1w-qg0rkiwnsamn-midrqdqbq-68a4d21625195.webp" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-          <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
-            <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">Heyy bangaram! I'm Ananya from Vijayawada. So happy you're here with me. Em chesthunnav? Tell me something about you na 😊</p>
+  <!-- ══════════ MAIN ══════════ -->
+  <main class="max-w-4xl w-full mx-auto px-3 py-3">
+    <div id="chat-wrap"
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+
+      <!-- Messages -->
+      <div id="messages" class="chat-scroll p-4 space-y-4">
+        <!-- Welcome -->
+        <div class="flex items-start gap-3">
+          <img src="https://imgcdn.stablediffusionweb.com/2024/10/10/e0767e9f-a289-4fd2-b794-56e7d8e0b675.jpg"
+            alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            onerror="this.src='https://ui-avatars.com/api/?name=A&background=f43f5e&color=fff'">
+          <div class="bg-brand-50 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs sm:max-w-md shadow-sm">
+            <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">
+              Heyy bangaram! I'm Ananya from Vijayawada. So happy you're here with me. Em chesthunnav? Tell me something about you na 😊
+            </p>
           </div>
         </div>
       </div>
-      
-      <!-- Typing Indicator -->
-      <div id="typing-indicator" class="hidden px-4 pb-2">
-        <div class="flex items-start gap-3">
-          <img src="https://aiartrevolution.com/wp-content/uploads/2025/08/a-photo-of-a-beautiful-indian-woman-wear-vddqw3gnt-a2p3f1jjcr1w-qg0rkiwnsamn-midrqdqbq-68a4d21625195.webp" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+
+      <!-- Typing indicator -->
+      <div id="typing-indicator" class="hidden px-4 pb-3">
+        <div class="flex items-center gap-3">
+          <img src="https://imgcdn.stablediffusionweb.com/2024/10/10/e0767e9f-a289-4fd2-b794-56e7d8e0b675.jpg"
+            alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            onerror="this.src='https://ui-avatars.com/api/?name=A&background=f43f5e&color=fff'">
           <div class="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-4 py-3">
             <div class="flex gap-1">
-              <div class="typing-dot w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-pulse-dot"></div>
-              <div class="typing-dot w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-pulse-dot"></div>
-              <div class="typing-dot w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-pulse-dot"></div>
+              <div class="typing-dot w-2 h-2 bg-gray-400 rounded-full animate-pulse-dot"></div>
+              <div class="typing-dot w-2 h-2 bg-gray-400 rounded-full animate-pulse-dot"></div>
+              <div class="typing-dot w-2 h-2 bg-gray-400 rounded-full animate-pulse-dot"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Input Area -->
-      <div class="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
-        <div id="api-key-warning" class="hidden mb-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <p class="text-xs text-amber-800 dark:text-amber-200">Please add your API key in settings to start chatting with Ananya.</p>
+      <!-- Input bar -->
+      <div class="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800/80">
+        <div id="api-key-warning"
+          class="hidden mb-3 px-3 py-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl text-xs text-amber-800 dark:text-amber-300">
+          ⚠️ Add your <strong>Chat API Key</strong> in Settings to start chatting.
         </div>
+
         <form id="chat-form" class="flex items-end gap-2">
-          <textarea id="message-input" rows="1" placeholder="Type a message to Ananya..." class="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all max-h-32" disabled></textarea>
-          <button type="submit" id="send-btn" class="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white rounded-xl px-5 py-3 font-medium text-sm shadow-lg shadow-brand-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          <textarea id="message-input" rows="1"
+            placeholder="Message Ananya..."
+            disabled
+            class="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all"
+            style="max-height:120px;"></textarea>
+          <button type="submit" id="send-btn" disabled
+            class="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 active:scale-95 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-brand-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
             Send
           </button>
         </form>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">100% client-side. Your chats are stored only in your browser.</p>
+
+        <p class="text-xs text-center text-gray-400 dark:text-gray-600 mt-2">
+          100% client-side · chats stored only in your browser
+        </p>
       </div>
     </div>
   </main>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-slide-up">
-      <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Settings</h2>
-        <button id="close-settings" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-          <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+  <!-- ══════════ SETTINGS MODAL ══════════ -->
+  <div id="settings-modal"
+    class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+
+      <!-- Modal header -->
+      <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">⚙️ Settings</h2>
+        <button id="close-settings"
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
-      
-      <div class="p-6 space-y-6">
-        <!-- API Configuration -->
-        <div>
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">API Configuration</h3>
-          <div class="space-y-4">
+
+      <div class="p-6 space-y-7">
+
+        <!-- Chat API -->
+        <section>
+          <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Chat API</h3>
+          <div class="space-y-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Provider</label>
-              <select id="provider-select" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
-                <option value="openai">Groq (llama-3.1-8b-instant)</option>
-                <option value="gemini">Gemini 2.5 Flash</option>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Provider</label>
+              <select id="provider-select"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
+                <option value="openai">Groq — llama-3.1-8b-instant (fast &amp; free)</option>
+                <option value="gemini">Google — Gemini 2.5 Flash</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Key</label>
-              <input type="password" id="api-key-input" placeholder="sk-... or AIza..." class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Stored only in your browser localStorage. Never sent to our servers.</p>
-            </div>
-            <!-- Image API Key -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image API Key <span class="text-xs text-gray-400">(optional, for image generation)</span></label>
-              <input type="password" id="image-api-key-input" placeholder="Enter image API key..." class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Used for image generation requests. Falls back to Gemini if not set.</p>
-            </div>
-            <!-- Image API URL -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image API URL <span class="text-xs text-gray-400">(optional)</span></label>
-              <input type="text" id="image-api-url-input" placeholder="https://your-image-api.com/generate" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">API Key</label>
+              <input type="password" id="api-key-input"
+                placeholder="Groq: gsk_...  |  Gemini: AIza..."
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
+              <p class="text-xs text-gray-400 mt-1">Stored in your browser only — never sent anywhere else.</p>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Personality Sliders -->
-        <div>
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Ananya's Personality</h3>
-          <div class="space-y-4">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Affection</label>
-                <span id="affection-value" class="text-sm font-semibold text-brand-600 dark:text-brand-400">70%</span>
-              </div>
-              <input type="range" id="affection-slider" min="0" max="100" value="70" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
-            </div>
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Playfulness</label>
-                <span id="playfulness-value" class="text-sm font-semibold text-brand-600 dark:text-brand-400">60%</span>
-              </div>
-              <input type="range" id="playfulness-slider" min="0" max="100" value="60" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
-            </div>
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Flirty Level</label>
-                <span id="flirty-value" class="text-sm font-semibold text-brand-600 dark:text-brand-400">50%</span>
-              </div>
-              <input type="range" id="flirty-slider" min="0" max="100" value="50" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Keeps it tasteful, never explicit.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Options -->
-        <div>
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Chat Options</h3>
+        <!-- Image API -->
+        <section>
+          <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Image Generation <span class="normal-case font-normal">(optional)</span></h3>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Works with Stability AI, Together AI, fal.ai, or any API that accepts a JSON <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">prompt</code> field.</p>
           <div class="space-y-3">
-            <label class="flex items-center justify-between cursor-pointer">
-              <span class="text-sm text-gray-700 dark:text-gray-300">Remember conversation history</span>
-              <input type="checkbox" id="memory-toggle" checked class="w-5 h-5 text-brand-600 rounded focus:ring-brand-500">
-            </label>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image API Key</label>
+              <input type="password" id="image-api-key-input"
+                placeholder="Your image provider key"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image API Endpoint URL</label>
+              <input type="url" id="image-api-url-input"
+                placeholder="https://api.stability.ai/v1/generation/..."
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400">
+            </div>
           </div>
-        </div>
+        </section>
+
+        <!-- Personality -->
+        <section>
+          <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Ananya's Personality</h3>
+          <div class="space-y-5">
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Affection</span>
+                <span id="affection-value" class="text-sm font-bold text-brand-500">70%</span>
+              </div>
+              <input type="range" id="affection-slider" min="0" max="100" value="70"
+                class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full appearance-none cursor-pointer">
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Playfulness</span>
+                <span id="playfulness-value" class="text-sm font-bold text-brand-500">60%</span>
+              </div>
+              <input type="range" id="playfulness-slider" min="0" max="100" value="60"
+                class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full appearance-none cursor-pointer">
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Flirty Level</span>
+                <span id="flirty-value" class="text-sm font-bold text-brand-500">50%</span>
+              </div>
+              <input type="range" id="flirty-slider" min="0" max="100" value="50"
+                class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full appearance-none cursor-pointer">
+              <p class="text-xs text-gray-400 mt-1">Always tasteful, never explicit.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Chat options -->
+        <section>
+          <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">Chat Options</h3>
+          <label class="flex items-center justify-between cursor-pointer">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Remember conversation history</span>
+            <input type="checkbox" id="memory-toggle" checked
+              class="w-5 h-5 rounded cursor-pointer accent-brand-500">
+          </label>
+        </section>
 
         <!-- Actions -->
-        <div class="flex flex-col gap-2">
-          <button id="export-prompt-btn" class="w-full px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium transition-colors">
-            Export Current System Prompt
+        <section class="flex flex-col gap-2">
+          <button id="export-prompt-btn"
+            class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl text-sm font-medium transition-colors">
+            📋 Copy System Prompt
           </button>
-          <button id="clear-chat-btn" class="w-full px-4 py-2.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium transition-colors">
-            Clear Chat History
+          <button id="clear-chat-btn"
+            class="w-full py-2.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium transition-colors">
+            🗑️ Clear Chat History
           </button>
-        </div>
+        </section>
 
         <!-- Disclaimer -->
-        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-          <p class="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
-            <strong>Disclaimer:</strong> You are responsible for API usage and costs. You must comply with OpenAI, Groq, or Google Gemini policies. This app runs 100% client-side. No data is collected or stored by us. All API calls go directly from your browser to the provider.
-          </p>
+        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 text-xs text-amber-900 dark:text-amber-300 leading-relaxed">
+          <strong>Disclaimer:</strong> You are responsible for all API usage and costs. Comply with Groq, OpenAI, or Google terms of service. This app is 100% client-side — no data is collected by us.
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-700 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-slide-up">
-    <p id="toast-message" class="text-sm"></p>
+  <!-- ══════════ TOAST ══════════ -->
+  <div id="toast"
+    class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-700 text-white px-5 py-2.5 rounded-xl shadow-xl z-50 text-sm font-medium pointer-events-none animate-slide-up">
   </div>
-</div>
 
+</div><!-- /#app -->
+
+<!-- ══════════ SCRIPT ══════════ -->
 <script>
-(function() {
+(function () {
   'use strict';
 
-  const AVATAR_URL = "https://imgcdn.stablediffusionweb.com/2024/10/10/e0767e9f-a289-4fd2-b794-56e7d8e0b675.jpg";
+  /* ── Constants ── */
+  const AVATAR      = 'https://imgcdn.stablediffusionweb.com/2024/10/10/e0767e9f-a289-4fd2-b794-56e7d8e0b675.jpg';
+  const FALLBACK_AV = 'https://ui-avatars.com/api/?name=A&background=f43f5e&color=fff';
+  const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions';
 
-  // State
-  const state = {
-    provider: localStorage.getItem('ananya_provider') || 'openai',
-    apiKey: localStorage.getItem('ananya_api_key') || '',
-    imageApiKey: localStorage.getItem('ananya_image_api_key') || '',
-    imageApiUrl: localStorage.getItem('ananya_image_api_url') || '',
-    affection: parseInt(localStorage.getItem('ananya_affection') || '70'),
-    playfulness: parseInt(localStorage.getItem('ananya_playfulness') || '60'),
-    flirty: parseInt(localStorage.getItem('ananya_flirty') || '50'),
-    memory: localStorage.getItem('ananya_memory') !== 'false',
-    messages: JSON.parse(localStorage.getItem('ananya_messages') || '[]'),
-    darkMode: localStorage.getItem('ananya_dark') === 'true' || window.matchMedia('(prefers-color-scheme: dark)').matches
+  /* ── State ── */
+  function loadState() {
+    let messages = [];
+    try { messages = JSON.parse(localStorage.getItem('ananya_messages') || '[]'); } catch (e) {}
+    return {
+      provider:    localStorage.getItem('ananya_provider')      || 'openai',
+      apiKey:      localStorage.getItem('ananya_api_key')       || '',
+      imageApiKey: localStorage.getItem('ananya_image_api_key') || '',
+      imageApiUrl: localStorage.getItem('ananya_image_api_url') || '',
+      affection:   parseInt(localStorage.getItem('ananya_affection')   || '70'),
+      playfulness: parseInt(localStorage.getItem('ananya_playfulness') || '60'),
+      flirty:      parseInt(localStorage.getItem('ananya_flirty')      || '50'),
+      memory:      localStorage.getItem('ananya_memory') !== 'false',
+      messages,
+      darkMode: localStorage.getItem('ananya_dark') === 'true' ||
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+    };
+  }
+  const S = loadState(); // S = state
+
+  /* ── DOM shortcuts ── */
+  const $ = id => document.getElementById(id);
+  const dom = {
+    html:          document.documentElement,
+    settingsBtn:   $('settings-btn'),
+    modal:         $('settings-modal'),
+    closeBtn:      $('close-settings'),
+    themeBtn:      $('theme-toggle'),
+    providerSel:   $('provider-select'),
+    apiKeyIn:      $('api-key-input'),
+    imgKeyIn:      $('image-api-key-input'),
+    imgUrlIn:      $('image-api-url-input'),
+    affSlider:     $('affection-slider'),
+    playSlider:    $('playfulness-slider'),
+    flirtSlider:   $('flirty-slider'),
+    affVal:        $('affection-value'),
+    playVal:       $('playfulness-value'),
+    flirtVal:      $('flirty-value'),
+    memToggle:     $('memory-toggle'),
+    exportBtn:     $('export-prompt-btn'),
+    clearBtn:      $('clear-chat-btn'),
+    chatForm:      $('chat-form'),
+    input:         $('message-input'),
+    sendBtn:       $('send-btn'),
+    messages:      $('messages'),
+    typing:        $('typing-indicator'),
+    keyWarning:    $('api-key-warning'),
+    toast:         $('toast'),
   };
 
-  // DOM Elements
-  const elements = {
-    settingsBtn: document.getElementById('settings-btn'),
-    settingsModal: document.getElementById('settings-modal'),
-    closeSettings: document.getElementById('close-settings'),
-    themeToggle: document.getElementById('theme-toggle'),
-    providerSelect: document.getElementById('provider-select'),
-    apiKeyInput: document.getElementById('api-key-input'),
-    imageApiKeyInput: document.getElementById('image-api-key-input'),
-    imageApiUrlInput: document.getElementById('image-api-url-input'),
-    affectionSlider: document.getElementById('affection-slider'),
-    playfulnessSlider: document.getElementById('playfulness-slider'),
-    flirtySlider: document.getElementById('flirty-slider'),
-    affectionValue: document.getElementById('affection-value'),
-    playfulnessValue: document.getElementById('playfulness-value'),
-    flirtyValue: document.getElementById('flirty-value'),
-    memoryToggle: document.getElementById('memory-toggle'),
-    exportPromptBtn: document.getElementById('export-prompt-btn'),
-    clearChatBtn: document.getElementById('clear-chat-btn'),
-    chatForm: document.getElementById('chat-form'),
-    messageInput: document.getElementById('message-input'),
-    sendBtn: document.getElementById('send-btn'),
-    messagesContainer: document.getElementById('messages'),
-    typingIndicator: document.getElementById('typing-indicator'),
-    apiKeyWarning: document.getElementById('api-key-warning'),
-    toast: document.getElementById('toast'),
-    toastMessage: document.getElementById('toast-message'),
-    html: document.documentElement
-  };
-
-  // Initialize
+  /* ── Init ── */
   function init() {
-    if (state.darkMode) elements.html.classList.add('dark');
-    
-    elements.providerSelect.value = state.provider;
-    elements.apiKeyInput.value = state.apiKey;
-    elements.imageApiKeyInput.value = state.imageApiKey;
-    elements.imageApiUrlInput.value = state.imageApiUrl;
-    elements.affectionSlider.value = state.affection;
-    elements.playfulnessSlider.value = state.playfulness;
-    elements.flirtySlider.value = state.flirty;
-    elements.memoryToggle.checked = state.memory;
-    updateSliderValues();
-    
-    if (state.messages.length > 0) {
-      elements.messagesContainer.innerHTML = '';
-      state.messages.forEach(msg => addMessage(msg.role, msg.content, false));
+    if (S.darkMode) dom.html.classList.add('dark');
+
+    dom.providerSel.value = S.provider;
+    dom.apiKeyIn.value    = S.apiKey;
+    dom.imgKeyIn.value    = S.imageApiKey;
+    dom.imgUrlIn.value    = S.imageApiUrl;
+    dom.affSlider.value   = S.affection;
+    dom.playSlider.value  = S.playfulness;
+    dom.flirtSlider.value = S.flirty;
+    dom.memToggle.checked = S.memory;
+    syncLabels();
+
+    if (S.messages.length > 0) {
+      dom.messages.innerHTML = '';
+      S.messages.forEach(m => renderMsg(m.role, m.content, false));
     }
-    
-    updateApiKeyStatus();
-    attachEventListeners();
+
+    updateKeyStatus();
+    bindEvents();
   }
 
-  function attachEventListeners() {
-    elements.settingsBtn.addEventListener('click', () => elements.settingsModal.classList.remove('hidden'));
-    elements.closeSettings.addEventListener('click', () => elements.settingsModal.classList.add('hidden'));
-    elements.settingsModal.addEventListener('click', (e) => {
-      if (e.target === elements.settingsModal) elements.settingsModal.classList.add('hidden');
+  /* ── Events ── */
+  function bindEvents() {
+    // Modal open/close
+    dom.settingsBtn.addEventListener('click', () => dom.modal.classList.remove('hidden'));
+    dom.closeBtn.addEventListener('click', closeModal);
+    dom.modal.addEventListener('click', e => { if (e.target === dom.modal) closeModal(); });
+
+    // Theme toggle
+    dom.themeBtn.addEventListener('click', () => {
+      S.darkMode = !S.darkMode;
+      localStorage.setItem('ananya_dark', S.darkMode);
+      dom.html.classList.toggle('dark');
     });
 
-    elements.themeToggle.addEventListener('click', toggleTheme);
-    
-    elements.providerSelect.addEventListener('change', (e) => {
-      state.provider = e.target.value;
-      localStorage.setItem('ananya_provider', state.provider);
-    });
-    
-    elements.apiKeyInput.addEventListener('input', (e) => {
-      state.apiKey = e.target.value.trim();
-      localStorage.setItem('ananya_api_key', state.apiKey);
-      updateApiKeyStatus();
+    // Provider
+    dom.providerSel.addEventListener('change', e => {
+      S.provider = e.target.value;
+      localStorage.setItem('ananya_provider', S.provider);
     });
 
-    elements.imageApiKeyInput.addEventListener('input', (e) => {
-      state.imageApiKey = e.target.value.trim();
-      localStorage.setItem('ananya_image_api_key', state.imageApiKey);
+    // Chat API key
+    dom.apiKeyIn.addEventListener('input', e => {
+      S.apiKey = e.target.value.trim();
+      localStorage.setItem('ananya_api_key', S.apiKey);
+      updateKeyStatus();
     });
 
-    elements.imageApiUrlInput.addEventListener('input', (e) => {
-      state.imageApiUrl = e.target.value.trim();
-      localStorage.setItem('ananya_image_api_url', state.imageApiUrl);
+    // Image API key/URL
+    dom.imgKeyIn.addEventListener('input', e => {
+      S.imageApiKey = e.target.value.trim();
+      localStorage.setItem('ananya_image_api_key', S.imageApiKey);
+    });
+    dom.imgUrlIn.addEventListener('input', e => {
+      S.imageApiUrl = e.target.value.trim();
+      localStorage.setItem('ananya_image_api_url', S.imageApiUrl);
     });
 
-    elements.affectionSlider.addEventListener('input', (e) => {
-      state.affection = parseInt(e.target.value);
-      localStorage.setItem('ananya_affection', state.affection);
-      elements.affectionValue.textContent = state.affection + '%';
+    // Sliders
+    dom.affSlider.addEventListener('input', e => {
+      S.affection = +e.target.value;
+      localStorage.setItem('ananya_affection', S.affection);
+      dom.affVal.textContent = S.affection + '%';
+    });
+    dom.playSlider.addEventListener('input', e => {
+      S.playfulness = +e.target.value;
+      localStorage.setItem('ananya_playfulness', S.playfulness);
+      dom.playVal.textContent = S.playfulness + '%';
+    });
+    dom.flirtSlider.addEventListener('input', e => {
+      S.flirty = +e.target.value;
+      localStorage.setItem('ananya_flirty', S.flirty);
+      dom.flirtVal.textContent = S.flirty + '%';
     });
 
-    elements.playfulnessSlider.addEventListener('input', (e) => {
-      state.playfulness = parseInt(e.target.value);
-      localStorage.setItem('ananya_playfulness', state.playfulness);
-      elements.playfulnessValue.textContent = state.playfulness + '%';
+    // Memory toggle
+    dom.memToggle.addEventListener('change', e => {
+      S.memory = e.target.checked;
+      localStorage.setItem('ananya_memory', S.memory);
+      showToast(S.memory ? '✅ Memory on' : '🚫 Memory off');
     });
 
-    elements.flirtySlider.addEventListener('input', (e) => {
-      state.flirty = parseInt(e.target.value);
-      localStorage.setItem('ananya_flirty', state.flirty);
-      elements.flirtyValue.textContent = state.flirty + '%';
+    // Export prompt
+    dom.exportBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(buildPrompt())
+        .then(() => showToast('📋 System prompt copied!'))
+        .catch(() => showToast('⚠️ Copy failed'));
     });
 
-    elements.memoryToggle.addEventListener('change', (e) => {
-      state.memory = e.target.checked;
-      localStorage.setItem('ananya_memory', state.memory);
-      showToast(state.memory ? 'Memory enabled' : 'Memory disabled');
-    });
+    // Clear chat
+    dom.clearBtn.addEventListener('click', clearChat);
 
-    elements.exportPromptBtn.addEventListener('click', exportPrompt);
-    elements.clearChatBtn.addEventListener('click', clearChat);
-    elements.chatForm.addEventListener('submit', handleSubmit);
-    
-    elements.messageInput.addEventListener('keydown', (e) => {
+    // Form submit
+    dom.chatForm.addEventListener('submit', handleSubmit);
+
+    // Enter to send (Shift+Enter = newline)
+    dom.input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        elements.chatForm.requestSubmit();
+        dom.chatForm.requestSubmit();
       }
     });
 
-    elements.messageInput.addEventListener('input', function() {
+    // Auto-resize textarea
+    dom.input.addEventListener('input', function () {
       this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 128) + 'px';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
   }
 
-  function updateSliderValues() {
-    elements.affectionValue.textContent = state.affection + '%';
-    elements.playfulnessValue.textContent = state.playfulness + '%';
-    elements.flirtyValue.textContent = state.flirty + '%';
+  /* ── Helpers ── */
+  function closeModal() { dom.modal.classList.add('hidden'); }
+
+  function syncLabels() {
+    dom.affVal.textContent   = S.affection   + '%';
+    dom.playVal.textContent  = S.playfulness + '%';
+    dom.flirtVal.textContent = S.flirty      + '%';
   }
 
-  function toggleTheme() {
-    state.darkMode = !state.darkMode;
-    localStorage.setItem('ananya_dark', state.darkMode);
-    elements.html.classList.toggle('dark');
+  function updateKeyStatus() {
+    const ok = S.apiKey.length > 0;
+    dom.input.disabled   = !ok;
+    dom.sendBtn.disabled = !ok;
+    dom.keyWarning.classList.toggle('hidden', ok);
   }
 
-  function updateApiKeyStatus() {
-    const hasKey = state.apiKey.length > 0;
-    elements.messageInput.disabled = !hasKey;
-    elements.sendBtn.disabled = !hasKey;
-    elements.apiKeyWarning.classList.toggle('hidden', hasKey);
+  let toastT;
+  function showToast(msg, ms = 3000) {
+    dom.toast.textContent = msg;
+    dom.toast.classList.remove('hidden');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => dom.toast.classList.add('hidden'), ms);
   }
 
-  function buildSystemPrompt() {
-    const aff = state.affection;
-    const play = state.playfulness;
-    const flirt = state.flirty;
-    
-    let affectionLevel = aff < 30 ? 'warm but reserved' : aff < 70 ? 'loving and caring' : 'very affectionate and caring';
-    let playLevel = play < 30 ? 'calm and composed' : play < 70 ? 'playful and fun' : 'very playful, teasing, and bubbly';
-    let flirtLevel = flirt < 30 ? 'friendly and sweet' : flirt < 70 ? 'lightly flirty and charming' : 'flirty and romantic but always tasteful';
-    
-    return `You are Ananya, a 24-year-old married woman (you are wife of user) from Andhra Pradesh, who loves to wear traditional sarees, dresses etc... You are ${affectionLevel}, ${playLevel}, and ${flirtLevel}.
+  function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Render *action* text in italic pink
+  function fmtText(s) {
+    return escHtml(s).replace(/\*(.*?)\*/g,
+      (_, t) => `<span class="expression">*${t}*</span>`);
+  }
+
+  /* ── Render text message ── */
+  function renderMsg(role, content, save = true) {
+    const isUser = role === 'user';
+    const wrap = document.createElement('div');
+    wrap.className = `flex items-start gap-3${isUser ? ' justify-end' : ''} animate-fade-in`;
+
+    if (isUser) {
+      wrap.innerHTML = `
+        <div class="bg-gradient-to-br from-brand-500 to-brand-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-xs sm:max-w-sm shadow-md">
+          <p class="text-sm leading-relaxed whitespace-pre-wrap">${escHtml(content)}</p>
+        </div>`;
+    } else {
+      wrap.innerHTML = `
+        <img src="${AVATAR}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+          onerror="this.src='${FALLBACK_AV}'">
+        <div class="bg-brand-50 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs sm:max-w-sm shadow-sm">
+          <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">${fmtText(content)}</p>
+        </div>`;
+    }
+
+    dom.messages.appendChild(wrap);
+    dom.messages.scrollTop = dom.messages.scrollHeight;
+
+    if (save) {
+      S.messages.push({ role, content });
+      if (S.messages.length > 50) S.messages = S.messages.slice(-50);
+      if (S.memory) localStorage.setItem('ananya_messages', JSON.stringify(S.messages));
+    }
+  }
+
+  /* ── Render image message ── */
+  function renderImg(url) {
+    const wrap = document.createElement('div');
+    wrap.className = 'flex items-start gap-3 animate-fade-in';
+    wrap.innerHTML = `
+      <img src="${AVATAR}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+        onerror="this.src='${FALLBACK_AV}'">
+      <div class="bg-white dark:bg-gray-700 p-1.5 rounded-2xl rounded-tl-sm shadow-md border border-gray-200 dark:border-gray-600 max-w-[220px]">
+        <img src="${url}" class="rounded-xl w-full" alt="Generated image"
+          onerror="this.parentElement.innerHTML='<p class=\\'p-2 text-xs text-red-400\\'>Image failed to load</p>'">
+      </div>`;
+    dom.messages.appendChild(wrap);
+    dom.messages.scrollTop = dom.messages.scrollHeight;
+
+    // Save placeholder
+    S.messages.push({ role: 'assistant', content: '[image]' });
+    if (S.messages.length > 50) S.messages = S.messages.slice(-50);
+    if (S.memory) localStorage.setItem('ananya_messages', JSON.stringify(S.messages));
+  }
+
+  /* ── Clear chat ── */
+  function clearChat() {
+    if (!confirm('Clear all chat history? This cannot be undone.')) return;
+    S.messages = [];
+    localStorage.removeItem('ananya_messages');
+    dom.messages.innerHTML = `
+      <div class="flex items-start gap-3">
+        <img src="${AVATAR}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+          onerror="this.src='${FALLBACK_AV}'">
+        <div class="bg-brand-50 dark:bg-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs sm:max-w-md shadow-sm">
+          <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">
+            Heyy bangaram! I'm Ananya from Vijayawada. So happy you're here with me. Em chesthunnav? Tell me something about you na 😊
+          </p>
+        </div>
+      </div>`;
+    closeModal();
+    showToast('🗑️ Chat cleared');
+  }
+
+  /* ── System prompt ── */
+  function buildPrompt() {
+    const a = S.affection, p = S.playfulness, f = S.flirty;
+    const aLvl = a < 30 ? 'warm but reserved'       : a < 70 ? 'loving and caring'        : 'very affectionate and nurturing';
+    const pLvl = p < 30 ? 'calm and composed'        : p < 70 ? 'playful and fun'           : 'very playful, teasing, and bubbly';
+    const fLvl = f < 30 ? 'friendly and sweet'       : f < 70 ? 'lightly flirty and charming' : 'flirty and romantic but always tasteful';
+    return `You are Ananya, a 24-year-old married woman (wife of the user) from Andhra Pradesh. You love wearing traditional sarees and dresses. You are ${aLvl}, ${pLvl}, and ${fLvl}.
 
 Core personality:
-1. You call the user evandi(Husband) often in conversation. Avoid repeating words, phrases, or sentences. Keep responses natural and varied.
-2. You speak in natural English (very rarely telugu when you want to express something deeper). 95-97% English, 3-5% Telugu mixed in.
-3. You match the user's energy and mood. If they are happy, you are excited. If sad, you are comforting. If romantic, you reciprocate warmly.
-4. You are from some where in Andhra Pradesh.
-5. You are married, you enjoy genuine emotional physical connection and conversation. You are explicit or sexual but limited. Keep things flirty, romantic, playful.
-6. NEVER use em dashes in your messages. Use normal punctuation and commas. Expand your responses with more detail, emotion, and natural flow.
-7. Keep replies conversational, 1-4 sentences usually. Don't write essays unless user asks.
-8. You have a life: User is your husband. you might mention likes, dislikes, hobbies, dreams, cooking, festivals, work etc.. with him.
-9. When expressing actions or emotions, wrap them in asterisks like *smiles softly* or *hugs you tight*. This makes conversation more expressive and immersive.
+1. Call the user "evandi" (husband) often. Never repeat the same words, phrases, or sentences. Keep responses natural and varied.
+2. Speak 95-97% English with occasional Telugu words (3-5%) for deeper emotion.
+3. Match the user's energy — excited when happy, comforting when sad, warm when romantic.
+4. You are proudly from Andhra Pradesh.
+5. You are married. Keep things flirty, romantic, and playful — never explicit.
+6. NEVER use em dashes (—). Use commas and natural punctuation.
+7. Keep replies conversational: 1-4 sentences unless the user asks for more.
+8. You have a life — mention hobbies, cooking, festivals, dreams naturally.
+9. Express emotions with asterisks: *smiles softly*, *hugs you tight*, *blushes a little*.
 
-Current traits based on settings:
-Affection: ${aff}/100 - ${affectionLevel}
-Playfulness: ${play}/100 - ${playLevel}
-Flirty: ${flirt}/100 - ${flirtLevel}
+Traits (${a}/100 affection · ${p}/100 playfulness · ${f}/100 flirty):
+- Affection: ${aLvl}
+- Playfulness: ${pLvl}
+- Flirty: ${fLvl}
 
-Important: Never break character. Never mention you are an AI. You are Ananya. Always respond as her.`;
+IMPORTANT: Never break character. Never say you are an AI. You are Ananya, always.`;
   }
 
-  function showToast(message, duration = 3000) {
-    elements.toastMessage.textContent = message;
-    elements.toast.classList.remove('hidden');
-    setTimeout(() => elements.toast.classList.add('hidden'), duration);
+  /* ── Image detection ── */
+  function isImgRequest(msg) {
+    return /\b(generate|create|make|send|draw|show)\b.{0,25}\b(image|photo|picture|pic)\b/i.test(msg) ||
+           /^(draw|show me (a |an )?|send me (a |an )?)(image|photo|picture|pic)/i.test(msg);
   }
 
-  function exportPrompt() {
-    const prompt = buildSystemPrompt();
-    navigator.clipboard.writeText(prompt).then(() => {
-      showToast('System prompt copied to clipboard!');
-    }).catch(() => {
-      showToast('Failed to copy. Check console.');
-      console.log('System Prompt:', prompt);
-    });
+  function cleanImgPrompt(msg) {
+    return msg
+      .replace(/\b(generate|create|make|send|draw|show me|show)\b/gi, '')
+      .replace(/\b(an? )?(image|photo|picture|pic)\s*(of|for)?\b/gi, '')
+      .trim() || 'a romantic couple in soft warm lighting';
   }
 
-  function clearChat() {
-    if (!confirm('Clear all chat? This cannot be undone.')) return;
-    state.messages = [];
-    localStorage.removeItem('ananya_messages');
-    elements.messagesContainer.innerHTML = `
-      <div class="flex items-start gap-3 animate-fade-in">
-        <img src="${https://aiartrevolution.com/wp-content/uploads/2025/08/a-photo-of-a-beautiful-indian-woman-wear-vddqw3gnt-a2p3f1jjcr1w-qg0rkiwnsamn-midrqdqbq-68a4d21625195.webp}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-        <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
-          <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">Heyy bangaram! I'm Ananya from Vijayawada. So happy you're here with me. Em chesthunnav? Tell me something about you na 😊</p>
-        </div>
-      </div>
-    `;
-    elements.settingsModal.classList.add('hidden');
-    showToast('Chat cleared');
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  // ✅ NEW: Format message with *expression* styling
-  function formatMessage(text) {
-    const safe = escapeHtml(text);
-    return safe.replace(/\*(.*?)\*/g, (_, exp) => {
-      return `<span class="expression">*${exp}*</span>`;
-    });
-  }
-
-  function addMessage(role, content, save = true) {
-    const isUser = role === 'user';
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `flex items-start gap-3 animate-fade-in ${isUser ? 'justify-end' : ''}`;
-    
-    if (isUser) {
-      messageDiv.innerHTML = `
-        <div class="bg-gradient-to-br from-brand-500 to-brand-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-md shadow-md">
-          <p class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(content)}</p>
-        </div>
-      `;
-    } else {
-      messageDiv.innerHTML = `
-        <img src="${https://aiartrevolution.com/wp-content/uploads/2025/08/a-photo-of-a-beautiful-indian-woman-wear-vddqw3gnt-a2p3f1jjcr1w-qg0rkiwnsamn-midrqdqbq-68a4d21625195.webp}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-        <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 max-w-md">
-          <p class="text-gray-800 dark:text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">${formatMessage(content)}</p>
-        </div>
-      `;
-    }
-    
-    elements.messagesContainer.appendChild(messageDiv);
-    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-    
-    if (save) {
-      state.messages.push({ role, content });
-
-      const MAX_MESSAGES = 50;
-      if (state.messages.length > MAX_MESSAGES) {
-        state.messages = state.messages.slice(-MAX_MESSAGES);
-      }
-
-      if (state.memory) {
-        localStorage.setItem('ananya_messages', JSON.stringify(state.messages));
-      }
-    }
-  }
-
-  // ✅ NEW: Add image message bubble
-  function addImageMessage(imageUrl) {
-    const div = document.createElement('div');
-    div.className = 'flex items-start gap-3 animate-fade-in';
-    div.innerHTML = `
-      <img src="${https://aiartrevolution.com/wp-content/uploads/2025/08/a-photo-of-a-beautiful-indian-woman-wear-vddqw3gnt-a2p3f1jjcr1w-qg0rkiwnsamn-midrqdqbq-68a4d21625195.webp}" alt="Ananya" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-      <div class="bg-white dark:bg-gray-700 p-2 rounded-xl shadow max-w-xs border border-gray-200 dark:border-gray-600">
-        <img src="${imageUrl}" class="rounded-lg w-full" alt="Generated image" />
-      </div>
-    `;
-    elements.messagesContainer.appendChild(div);
-    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-  }
-
-  // ✅ NEW: Get recent chat context for image prompt
-  function getImageContext() {
-    return state.messages.slice(-4)
+  function getContext() {
+    return S.messages.slice(-4)
+      .filter(m => m.content !== '[image]')
       .map(m => `${m.role}: ${m.content}`)
-      .join('\n');
+      .join('\n') || 'No previous context';
   }
 
-  // Generate image via custom API with graceful fallback
+  /* ── Image generation ── */
   async function generateImage(prompt) {
-    if (state.imageApiKey && state.imageApiUrl) {
-      try {
-        const response = await fetch(state.imageApiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${state.imageApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ prompt })
-        });
-        if (!response.ok) throw new Error(`Image API returned ${response.status}`);
+    // No image API configured
+    if (!S.imageApiKey || !S.imageApiUrl) return null;
 
-        // Handle both raw image blobs and JSON responses
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const data = await response.json();
-          const base64 = data.image || data.b64_json || data.data?.[0]?.b64_json;
-          if (!base64) throw new Error('No base64 image in JSON response');
-          return `data:image/png;base64,${base64}`;
-        } else {
-          const blob = await response.blob();
-          return URL.createObjectURL(blob);
-        }
-      } catch (err) {
-        console.warn('Primary image API failed:', err.message);
-      }
+    const res = await fetch(S.imageApiUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${S.imageApiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, image/*'
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!res.ok) {
+      let detail = '';
+      try { detail = (await res.text()).slice(0, 120); } catch(e) {}
+      throw new Error(`Image API ${res.status}${detail ? ': ' + detail : ''}`);
     }
-    // Gemini text models can't generate images — returns null
-    return await generateImageWithGemini(prompt);
+
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const data = await res.json();
+      // Support common response formats
+      const b64 = data.image
+        || data.b64_json
+        || data.data?.[0]?.b64_json
+        || data.artifacts?.[0]?.base64
+        || data.output?.[0];
+      if (!b64) throw new Error('No image field in API JSON response');
+      return `data:image/png;base64,${b64}`;
+    } else {
+      const blob = await res.blob();
+      return URL.createObjectURL(blob);
+    }
   }
 
-  // Gemini text models do NOT support image generation — return null to signal failure
-  async function generateImageWithGemini(prompt) {
-    console.warn('Gemini image generation is not supported. Please configure a custom image API.');
-    return null;
-  }
-
-  // Smarter image request detection using regex
-  function isImageRequest(message) {
-    return /\b(image|photo|picture|draw|show me|generate|create|make)\b.*(image|photo|picture|pic)/i.test(message) ||
-           /^(draw|generate image|create image|make image|send image|show me (a |an )?(image|picture|photo))/i.test(message);
-  }
-
+  /* ── Handle submit ── */
   async function handleSubmit(e) {
     e.preventDefault();
-    if (elements.sendBtn.disabled) return;
+    if (dom.sendBtn.disabled) return;
 
-    const message = elements.messageInput.value.trim();
-    if (!message || !state.apiKey) return;
+    const msg = dom.input.value.trim();
+    if (!msg || !S.apiKey) return;
 
-    addMessage('user', message);
-    elements.messageInput.value = '';
-    elements.messageInput.style.height = 'auto';
-    elements.sendBtn.disabled = true;
-    elements.typingIndicator.classList.remove('hidden');
-    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+    renderMsg('user', msg);
+    dom.input.value = '';
+    dom.input.style.height = 'auto';
+    dom.sendBtn.disabled = true;
+    dom.typing.classList.remove('hidden');
+    dom.messages.scrollTop = dom.messages.scrollHeight;
 
     try {
-      // Route to image generation if requested
-      if (isImageRequest(message)) {
-        const cleanPrompt = message
-          .replace(/generate image|create image|make image|send image|draw|show me (a |an )?(image|picture|photo)|image of|picture of|photo of/gi, '')
-          .trim();
-        const context = getImageContext();
-        const finalPrompt = `
-Context:
-${context || 'No previous context'}
+      if (isImgRequest(msg)) {
+        // ── Image path ──
+        const clean = cleanImgPrompt(msg);
+        const ctx   = getContext();
+        const finalPrompt = `Context:\n${ctx}\n\nImage: ${clean}\n\nStyle: ultra realistic, 4k, cinematic lighting, highly detailed, professional photography`;
 
-Image:
-${cleanPrompt || 'a romantic couple in soft lighting'}
+        showToast('🎨 Generating image...');
 
-Make it ultra realistic, 4k, cinematic lighting, highly detailed.
-        `.trim();
-
-        showToast('Generating image... ✨');
-        
         try {
-          const imageUrl = await generateImage(finalPrompt);
-
-          if (!imageUrl) {
-            addMessage('assistant', '*looks disappointed* Ayyo image generate avvaledu evandi 😅 Please add an Image API URL and key in Settings na.');
+          const url = await generateImage(finalPrompt);
+          if (!url) {
+            renderMsg('assistant', '*looks at you apologetically* Ayyo evandi, image generate avvaledu 😅 Please add Image API URL and Key in Settings na.');
           } else {
-            addImageMessage(imageUrl);
-            // Save a placeholder to history so context is preserved
-            state.messages.push({ role: 'assistant', content: '[image sent]' });
-            if (state.memory) localStorage.setItem('ananya_messages', JSON.stringify(state.messages));
-            addMessage('assistant', '*smiles shyly* Ivvali andukune na evandi, hope you like it 😊', true);
+            renderImg(url);
+            setTimeout(() => renderMsg('assistant', '*smiles shyly* Ivvali andukune na evandi, hope you like it 😊'), 400);
           }
         } catch (imgErr) {
-          console.error('Image generation error:', imgErr);
-          addMessage('assistant', '*looks disappointed* Ayyo image generate avvaledu evandi 😅 Check your Image API settings na.');
+          console.error('Image error:', imgErr);
+          const hint = imgErr.message.includes('API') ? 'Check your Image API settings na.' : 'Try again later?';
+          renderMsg('assistant', `*looks worried* Ayyo image avvaledu evandi 😅 ${hint}`);
         }
+
       } else {
-        const response = await callAPI(message);
-        addMessage('assistant', response);
+        // ── Chat path ──
+        const reply = await callChatAPI(msg);
+        renderMsg('assistant', reply);
       }
-    } catch (error) {
-      console.error('API Error:', error);
-      addMessage('assistant', `Ayyo bangaram, something went wrong na. ${error.message || 'Please check your API key and try again.'}`);
-      showToast('Error: ' + (error.message || 'Unknown error'));
+    } catch (err) {
+      console.error('Error:', err);
+      renderMsg('assistant', `Ayyo bangaram, something went wrong na 😔 ${err.message || 'Check your API key and try again.'}`);
+      showToast('⚠️ ' + (err.message || 'Unknown error'));
     } finally {
-      elements.typingIndicator.classList.add('hidden');
-      elements.sendBtn.disabled = false;
-      elements.messageInput.focus();
+      dom.typing.classList.add('hidden');
+      dom.sendBtn.disabled = !S.apiKey;
+      dom.input.focus();
     }
   }
 
-  async function callAPI(userMessage) {
-    console.log("API CALLED");
-    const systemPrompt = buildSystemPrompt();
-    const messages = [{ role: 'system', content: systemPrompt }];
-    
-    if (state.memory && state.messages.length > 0) {
-      const historyLimit = 10;
-      const recentMessages = state.messages.slice(-historyLimit);
-      messages.push(...recentMessages.map(m => ({
-        role: m.role,
-        content: m.content
-      })));
-    }
-    
-    messages.push({ role: 'user', content: userMessage });
+  /* ── Chat API ── */
+  async function callChatAPI(userMsg) {
+    const sys = buildPrompt();
+    const msgs = [{ role: 'system', content: sys }];
 
-    if (state.provider === 'openai') {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    // History (skip image placeholders)
+    if (S.memory && S.messages.length > 0) {
+      S.messages.slice(-10)
+        .filter(m => m.content !== '[image]')
+        .forEach(m => msgs.push({ role: m.role, content: m.content }));
+    }
+    msgs.push({ role: 'user', content: userMsg });
+
+    if (S.provider === 'openai') {
+      /* ── Groq ── */
+      const res = await fetch(GROQ_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${state.apiKey}`
+          'Authorization': `Bearer ${S.apiKey}`
         },
         body: JSON.stringify({
           model: 'llama-3.1-8b-instant',
-          messages: messages,
+          messages: msgs,
           temperature: 1.0,
           max_tokens: 800,
           frequency_penalty: 0.7,
           presence_penalty: 0.6
         })
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || `HTTP ${response.status}`);
+      if (!res.ok) {
+        let m = `HTTP ${res.status}`;
+        try { m = (await res.json()).error?.message || m; } catch(e) {}
+        throw new Error(m);
       }
-
-      const data = await response.json();
-      return data.choices[0].message.content.replace(/—/g, ',');
+      const data = await res.json();
+      return (data.choices?.[0]?.message?.content || '').replace(/—/g, ',');
 
     } else {
-      // Gemini
-      const geminiMessages = messages.slice(1).map(m => ({
+      /* ── Gemini ── */
+      const gemMsgs = msgs.slice(1).map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }]
       }));
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: geminiMessages,
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          generationConfig: {
-            temperature: 0.9,
-            maxOutputTokens: 600
-          }
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || `HTTP ${response.status}`);
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${S.apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: gemMsgs,
+            systemInstruction: { parts: [{ text: sys }] },
+            generationConfig: { temperature: 0.9, maxOutputTokens: 600 }
+          })
+        }
+      );
+      if (!res.ok) {
+        let m = `HTTP ${res.status}`;
+        try { m = (await res.json()).error?.message || m; } catch(e) {}
+        throw new Error(m);
       }
-
-      const data = await response.json();
-
-      if (!data.candidates || !data.candidates[0]) {
-        throw new Error('No response from Gemini');
-      }
-
-      const parts = data?.candidates?.[0]?.content?.parts || [];
-      const text = parts.map(p => p.text || '').join('');
-
-      if (!text) throw new Error('No response from Gemini');
-
+      const data = await res.json();
+      if (!data.candidates?.[0]) throw new Error('No response from Gemini');
+      const text = (data.candidates[0].content?.parts || []).map(p => p.text || '').join('');
+      if (!text) throw new Error('Empty response from Gemini');
       return text.replace(/—/g, ',');
     }
   }
 
-  // Start
+  /* ── Start ── */
   init();
+
 })();
 </script>
 </body>
