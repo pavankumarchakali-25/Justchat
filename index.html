@@ -80,7 +80,7 @@ input[type="range"]::-moz-range-thumb {
 /* Full-height layout */
 #app { display: flex; flex-direction: column; min-height: 100vh; }
 main  { flex: 1; display: flex; flex-direction: column; }
-#chat-wrap { flex: 1; display: flex; flex-direction: column; height: calc(100vh - 76px); }
+#chat-wrap { flex: 1; display: flex; flex-direction: column; height: calc(100dvh - 76px); min-height: 0; }
 #messages  { flex: 1; overflow-y: auto; }
 </style>
 </head>
@@ -413,11 +413,16 @@ main  { flex: 1; display: flex; flex-direction: column; }
     dom.modal.addEventListener('click', e => { if (e.target === dom.modal) closeModal(); });
 
     // Theme toggle
-    dom.themeBtn.addEventListener('click', () => {
-      S.darkMode = !S.darkMode;
-      localStorage.setItem('ananya_dark', S.darkMode);
-      dom.html.classList.toggle('dark');
-    });
+   dom.themeBtn.addEventListener('click', () => {
+  S.darkMode = !S.darkMode;
+  localStorage.setItem('ananya_dark', S.darkMode);
+
+  if (S.darkMode) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+});
 
     // Provider
     dom.providerSel.addEventListener('change', e => {
@@ -492,6 +497,12 @@ main  { flex: 1; display: flex; flex-direction: column; }
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
+
+
+     window.addEventListener('resize', () => {
+    dom.messages.scrollTop = dom.messages.scrollHeight;
+  });
+
   }
 
   /* ── Helpers ── */
