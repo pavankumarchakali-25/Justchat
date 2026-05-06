@@ -384,7 +384,11 @@ main  { flex: 1; display: flex; flex-direction: column; }
 
   /* ── Init ── */
   function init() {
-    if (S.darkMode) dom.html.classList.add('dark');
+    if (S.darkMode) {
+  document.documentElement.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
+}
 
     dom.providerSel.value = S.provider;
     dom.apiKeyIn.value    = S.apiKey;
