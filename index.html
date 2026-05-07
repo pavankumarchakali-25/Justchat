@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ananya - Your Vijayawada Companion</title>
 
-<!-- Tailwind config MUST come before the CDN script -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Tailwind config MUST come immediately after the CDN script -->
 <script>
-  window.tailwind = window.tailwind || {};
-  window.tailwind.config = {
+  tailwind.config = {
     darkMode: 'class',
     theme: {
       extend: {
@@ -42,7 +42,6 @@
     }
   };
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -50,7 +49,39 @@
 *, *::before, *::after { box-sizing: border-box; font-family: 'Inter', sans-serif; }
 html, body { height: 100%; margin: 0; padding: 0; }
 
-/* Custom scrollbar */
+/* ── Dark mode CSS fallback (ensures toggle works even before Tailwind JIT) ── */
+html.dark body                    { background-color: #111827; color: #f9fafb; }
+html.dark header                  { background-color: #1f2937; border-color: #374151; }
+html.dark #chat-wrap              { background-color: #1f2937; border-color: #374151; }
+html.dark #messages               { background-color: #1f2937; }
+html.dark #settings-modal > div  { background-color: #1f2937; }
+html.dark .bg-white               { background-color: #1f2937; }
+html.dark .bg-gray-50             { background-color: #111827; }
+html.dark .bg-gray-100            { background-color: #374151; }
+html.dark .bg-gray-700            { background-color: #374151; }
+html.dark .bg-gray-800            { background-color: #1f2937; }
+html.dark .border-gray-200        { border-color: #374151; }
+html.dark .border-gray-700        { border-color: #374151; }
+html.dark .text-gray-900          { color: #f9fafb; }
+html.dark .text-gray-800          { color: #f3f4f6; }
+html.dark .text-gray-700          { color: #d1d5db; }
+html.dark .text-gray-600          { color: #9ca3af; }
+html.dark .text-gray-500          { color: #6b7280; }
+html.dark .text-gray-400          { color: #9ca3af; }
+html.dark .text-gray-300          { color: #d1d5db; }
+html.dark input, html.dark textarea, html.dark select {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+html.dark .hover\:bg-gray-100:hover { background-color: #374151; }
+html.dark .hover\:bg-gray-700:hover { background-color: #374151; }
+html.dark .bg-brand-50            { background-color: #374151; }
+html.dark .from-brand-50          { --tw-gradient-from: #374151; }
+html.dark .to-brand-100           { --tw-gradient-to: #4b5563; }
+html.dark .from-gray-700          { --tw-gradient-from: #374151; }
+html.dark .to-gray-600            { --tw-gradient-to: #4b5563; }
+html.dark .bg-gray-800\/80        { background-color: rgba(31,41,55,0.8); }
 .chat-scroll::-webkit-scrollbar { width: 5px; }
 .chat-scroll::-webkit-scrollbar-track { background: transparent; }
 .chat-scroll::-webkit-scrollbar-thumb { background: rgba(244,63,94,0.3); border-radius: 99px; }
@@ -117,11 +148,13 @@ main  { flex: 1; display: flex; flex-direction: column; }
         </button>
         <button id="theme-toggle" title="Toggle theme"
           class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-          <svg class="w-5 h-5 text-gray-500 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Sun icon: visible in light mode -->
+          <svg id="icon-sun" class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
-          <svg class="w-5 h-5 text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Moon icon: visible in dark mode -->
+          <svg id="icon-moon" class="w-5 h-5 text-gray-400" style="display:none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
           </svg>
@@ -360,6 +393,8 @@ main  { flex: 1; display: flex; flex-direction: column; }
     modal:         $('settings-modal'),
     closeBtn:      $('close-settings'),
     themeBtn:      $('theme-toggle'),
+    iconSun:       $('icon-sun'),
+    iconMoon:      $('icon-moon'),
     providerSel:   $('provider-select'),
     apiKeyIn:      $('api-key-input'),
     imgKeyIn:      $('image-api-key-input'),
@@ -382,9 +417,20 @@ main  { flex: 1; display: flex; flex-direction: column; }
     toast:         $('toast'),
   };
 
+  function syncThemeIcon() {
+    if (S.darkMode) {
+      dom.iconSun.style.display  = 'none';
+      dom.iconMoon.style.display = 'block';
+    } else {
+      dom.iconSun.style.display  = 'block';
+      dom.iconMoon.style.display = 'none';
+    }
+  }
+
   /* ── Init ── */
   function init() {
     if (S.darkMode) dom.html.classList.add('dark');
+    syncThemeIcon();
 
     dom.providerSel.value = S.provider;
     dom.apiKeyIn.value    = S.apiKey;
@@ -417,6 +463,7 @@ main  { flex: 1; display: flex; flex-direction: column; }
       S.darkMode = !S.darkMode;
       localStorage.setItem('ananya_dark', S.darkMode);
       dom.html.classList.toggle('dark');
+      syncThemeIcon();
     });
 
     // Provider
